@@ -1,0 +1,21 @@
+{
+  "mentions": [
+    {
+      "id": "1",
+      "status": "pending",
+      "message": "本番環境のバグ対応お願いします",
+      "createdBy": "U001",
+      "createdAt": "2024-01-15T10:00:00Z",
+      "updatedAt": "2024-01-15T10:00:00Z"
+    },
+    {
+      "id": "2",
+      "status": "in_progress",
+      "message": "レビューお願いします",
+      "assignee": { "id": "U002", "name": "田中" },
+      "createdBy": "U003",
+      "createdAt": "2024-01-15T11:00:00Z",
+      "updatedAt": "2024-01-15T11:30:00Z"
+    }
+  ]
+}
