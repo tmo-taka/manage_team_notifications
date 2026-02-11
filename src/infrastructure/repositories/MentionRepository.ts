@@ -1,12 +1,18 @@
 import type { Mention } from '../../domain/entities/Mention';
 import { httpClient } from '../api/httpClient';
+import type { IMentionRepository } from '../../application/ports/IMentionRepository';
 
-export const getMentions = async (): Promise<Mention[]> => {
+const getMentions = async (): Promise<Mention[]> => {
   const res = await httpClient.get('/mentions');
   return res.data;
 };
 
-export const updateMention = async (id: string, data: Partial<Mention>) => {
+const updateMention = async (id: string, data: Partial<Mention>) => {
   const res = await httpClient.patch(`/mentions/${id}`, data);
   return res.data;
+};
+
+export const mentionRepository: IMentionRepository = {
+  getMentions,
+  updateMention,
 };
