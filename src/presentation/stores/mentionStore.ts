@@ -11,7 +11,7 @@ export const useMentions = create((set) => ({
   mentions: [],
   filter: 'all',
   setMentions: (newMentions: Mention[]) => set({ mentions: newMentions }),
-  setFilter: (status: MentionStatus) =>
+  setFilter: (status: MentionStatus | 'all') =>
     set({
       filter: status,
     }),
