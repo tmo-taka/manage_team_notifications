@@ -1,11 +1,11 @@
-name: Lint
+name: Test
 
 on:
   pull_request:
     branches: [master, main]
 
 jobs:
-  lint:
+  test:
     uses: ./.github/workflows/setup.yml
     with:
-      command: npm run lint
+      command: npm run test:run
