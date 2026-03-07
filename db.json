@@ -16,6 +16,138 @@
       "createdBy": "U003",
       "createdAt": "2024-01-15T11:00:00Z",
       "updatedAt": "2024-01-15T11:30:00Z"
+    },
+    {
+      "id": "3",
+      "status": "completed",
+      "message": "デプロイ手順の確認お願いします",
+      "assignee": { "id": "U002", "name": "田中" },
+      "createdBy": "U004",
+      "createdAt": "2024-01-14T09:00:00Z",
+      "updatedAt": "2024-01-14T12:00:00Z"
+    },
+    {
+      "id": "4",
+      "status": "completed",
+      "message": "テストデータの作成をお願いします",
+      "assignee": { "id": "U005", "name": "鈴木" },
+      "createdBy": "U001",
+      "createdAt": "2024-01-13T14:00:00Z",
+      "updatedAt": "2024-01-13T16:30:00Z"
+    },
+    {
+      "id": "5",
+      "status": "skipped",
+      "message": "この件は別チームの担当でした",
+      "assignee": { "id": "U006", "name": "佐藤" },
+      "createdBy": "U003",
+      "createdAt": "2024-01-14T08:00:00Z",
+      "updatedAt": "2024-01-14T08:15:00Z"
+    },
+    {
+      "id": "6",
+      "status": "pending",
+      "message": "API仕様書のレビューお願いします",
+      "createdBy": "U004",
+      "createdAt": "2024-01-16T09:00:00Z",
+      "updatedAt": "2024-01-16T09:00:00Z"
+    },
+    {
+      "id": "7",
+      "status": "in_progress",
+      "message": "ログイン画面のデザイン修正お願いします",
+      "assignee": { "id": "U005", "name": "鈴木" },
+      "createdBy": "U001",
+      "createdAt": "2024-01-15T13:00:00Z",
+      "updatedAt": "2024-01-15T14:00:00Z"
+    },
+    {
+      "id": "8",
+      "status": "completed",
+      "message": "パフォーマンス改善のPR確認お願いします",
+      "assignee": { "id": "U006", "name": "佐藤" },
+      "createdBy": "U002",
+      "createdAt": "2024-01-12T10:00:00Z",
+      "updatedAt": "2024-01-13T09:00:00Z"
+    },
+    {
+      "id": "9",
+      "status": "in_progress",
+      "message": "新機能の結合テストお願いします",
+      "assignee": { "id": "U007", "name": "山田" },
+      "createdBy": "U003",
+      "createdAt": "2024-01-16T10:00:00Z",
+      "updatedAt": "2024-01-16T11:00:00Z"
+    },
+    {
+      "id": "10",
+      "status": "skipped",
+      "message": "既に対応済みの件でした",
+      "assignee": { "id": "U002", "name": "田中" },
+      "createdBy": "U004",
+      "createdAt": "2024-01-15T15:00:00Z",
+      "updatedAt": "2024-01-15T15:05:00Z"
+    },
+    {
+      "id": "11",
+      "status": "completed",
+      "message": "セキュリティレビューお願いします",
+      "assignee": { "id": "U007", "name": "山田" },
+      "createdBy": "U001",
+      "createdAt": "2024-01-11T09:00:00Z",
+      "updatedAt": "2024-01-12T18:00:00Z"
+    },
+    {
+      "id": "12",
+      "status": "pending",
+      "message": "ドキュメント更新お願いします",
+      "createdBy": "U002",
+      "createdAt": "2024-01-16T14:00:00Z",
+      "updatedAt": "2024-01-16T14:00:00Z"
+    },
+    {
+      "id": "13",
+      "status": "in_progress",
+      "message": "CIパイプラインの修正お願いします",
+      "assignee": { "id": "U006", "name": "佐藤" },
+      "createdBy": "U005",
+      "createdAt": "2024-01-16T08:00:00Z",
+      "updatedAt": "2024-01-16T09:30:00Z"
+    },
+    {
+      "id": "14",
+      "status": "completed",
+      "message": "エラーハンドリングの改善お願いします",
+      "assignee": { "id": "U005", "name": "鈴木" },
+      "createdBy": "U003",
+      "createdAt": "2024-01-10T11:00:00Z",
+      "updatedAt": "2024-01-11T15:00:00Z"
+    },
+    {
+      "id": "15",
+      "status": "pending",
+      "message": "データベースマイグレーションの確認お願いします",
+      "createdBy": "U006",
+      "createdAt": "2024-01-16T16:00:00Z",
+      "updatedAt": "2024-01-16T16:00:00Z"
+    },
+    {
+      "id": "16",
+      "status": "skipped",
+      "message": "仕様変更により不要になりました",
+      "assignee": { "id": "U007", "name": "山田" },
+      "createdBy": "U002",
+      "createdAt": "2024-01-14T10:00:00Z",
+      "updatedAt": "2024-01-14T10:20:00Z"
+    },
+    {
+      "id": "17",
+      "status": "completed",
+      "message": "モバイル対応のレビューお願いします",
+      "assignee": { "id": "U002", "name": "田中" },
+      "createdBy": "U005",
+      "createdAt": "2024-01-13T08:00:00Z",
+      "updatedAt": "2024-01-13T11:00:00Z"
     }
   ]
 }

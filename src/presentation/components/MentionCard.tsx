@@ -26,7 +26,7 @@ export const MentionCard = (props: PropsOfMentionCard): JSX.Element => {
     });
   };
   return (
-    <>
+    <div data-testid="mention-card">
       <span>{optimisticMention.status}</span>
       <p>{optimisticMention.message}</p>
       {optimisticMention.status === 'pending' && (
@@ -34,6 +34,6 @@ export const MentionCard = (props: PropsOfMentionCard): JSX.Element => {
           俺がやるぜ
         </button>
       )}
-    </>
+    </div>
   );
 };

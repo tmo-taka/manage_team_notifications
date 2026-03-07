@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "lint": "biome lint ./src",
     "format": "biome format --write ./src",
-    "check": "biome check --write ./src"
+    "check": "biome check --write ./src",
+    "test": "vitest",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.20",
