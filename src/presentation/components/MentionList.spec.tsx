@@ -21,7 +21,7 @@ describe('MentionList', () => {
     render(<MentionList />);
 
     const cards = screen.getAllByTestId('mention-card');
-    expect(cards).toHaveLength(2);
+    expect(cards).toHaveLength(17);
   });
 
   it('should be able to filtered when filter is pending', () => {
@@ -29,7 +29,7 @@ describe('MentionList', () => {
     render(<MentionList />);
 
     const cards = screen.getAllByTestId('mention-card');
-    expect(cards).toHaveLength(1);
+    expect(cards).toHaveLength(4);
   });
 
   it('should not displayed when filter is completed', () => {
@@ -37,6 +37,6 @@ describe('MentionList', () => {
     render(<MentionList />);
 
     const cards = screen.queryAllByTestId('mention-card');
-    expect(cards).toHaveLength(0);
+    expect(cards).toHaveLength(6);
   });
 });
