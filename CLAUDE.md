@@ -217,6 +217,212 @@ npx json-server --watch db.json --port 3001
 
 ---
 
+## Phase 8: 統計ダッシュボード（useMemo / useCallback / React.memo）
+
+### 学習の目的
+
+Phase 6で学んだ`useOptimistic`・`useTransition`に続き、Reactパフォーマンス最適化の3つの柱を学びます：
+
+| フック | 役割 | いつ使うか |
+|--------|------|-----------|
+| `useMemo` | 計算結果のメモ化 | 高コストな派生データ計算が毎レンダリングで走るのを防ぎたい時 |
+| `useCallback` | 関数参照の安定化 | 子コンポーネントにpropsで関数を渡す時 |
+| `React.memo` | コンポーネントの再レンダリング防止 | propsが変わっていないのに再レンダリングされるのを防ぎたい時 |
+
+**重要**: `useCallback` + `React.memo` はセットで意味を持ちます。片方だけでは効果がありません。
+
+### 学習の流れ
+
+```
+カスタムフック入門 (Task 8-2)
+  → useMemo で計算メモ化 (Task 8-3, 8-4)
+    → useCallback でハンドラ安定化 (Task 8-5)
+      → React.memo で再レンダリング防止 (Task 8-6)
+        → 全体統合 (Task 8-7)
+```
+
+### Task 8-1: モックデータ拡充
+
+`db.json` を2件から15〜20件に拡充してください。統計計算が意味のあるものになるよう、以下を満たすデータを用意します：
+
+- 4つのステータスがすべて含まれる（pending: 4件程度、in_progress: 4件程度、completed: 5件程度、skipped: 3件程度）
+- 複数の担当者（4人以上: 田中、鈴木、佐藤、山田など）
+- `createdAt` と `updatedAt` に差がある（対応時間の計算に使う）
+- `updatedAt` が `createdAt` より数時間〜数日後のデータを含める
+
+**ヒント**: completedのデータは `updatedAt - createdAt` の差がバラつくようにすると、平均対応時間の計算が面白くなります。
+
+### Task 8-2: `useDebouncedValue` カスタムフック作成
+
+`src/presentation/hooks/useDebouncedValue.ts` を作成してください。
+
+**仕様**:
+- ジェネリクス `<T>` で任意の型に対応
+- 引数: `value: T`, `delay: number`（ミリ秒）
+- 戻り値: デバウンスされた値 `T`
+- `useState` + `useEffect` + `setTimeout` で実装
+- cleanup関数でタイマーをクリア（メモリリーク防止）
+
+**テスト**: `src/presentation/hooks/useDebouncedValue.spec.ts` も作成。
+`@testing-library/react` の `renderHook` と `vi.useFakeTimers()` を使ってテストしてください。
+
+**学習ポイント**: これがもっともシンプルなカスタムフックです。`useState` と `useEffect` を組み合わせて再利用可能なロジックを抽出するパターンを身につけましょう。
+
+### Task 8-3: `useMentionStats` カスタムフック作成
+
+`src/presentation/hooks/useMentionStats.ts` を作成してください。
+
+**仕様**:
+- 引数: `mentions: Mention[]`（Zustandストアに依存しない設計）
+- 戻り値の型:
+  ```typescript
+  type MentionStats = {
+    statusCounts: Record<string, number>;  // ステータス別件数
+    responseRate: number;                   // 完了率（%）
+    averageResponseTime: number;            // 平均対応時間（ミリ秒）
+    leaderboard: Array<{ name: string; count: number }>;  // 対応者ランキング
+    totalCount: number;                     // 合計件数
+  };
+  ```
+- 各統計値を **個別の `useMemo`** で計算する
+
+**テスト**: `src/presentation/hooks/useMentionStats.spec.ts` も作成。
+
+**学習ポイント**:
+- なぜ `useMemo` が必要か → `console.log('[useMemo] statusCounts を再計算中...')` を各useMemoの中に入れて、再計算タイミングを確認してください
+- `mentions` が変わらない限り、フィルターボタンを押しても統計は再計算されないことを体感しましょう
+- 引数で `mentions` を受け取る設計にすることで、Zustandに依存せずテストしやすくなります
+
+**ヒント**:
+- 完了率: `(completedの件数 / 全件数) * 100`
+- 平均対応時間: statusが`completed`または`in_progress`で`updatedAt > createdAt`のメンションについて、`new Date(updatedAt).getTime() - new Date(createdAt).getTime()`の平均
+- リーダーボード: `assignee` があるメンションを `assignee.name` でグループ化し、件数で降順ソート
+
+### Task 8-4: `StatisticsPanel` コンポーネント作成
+
+`src/presentation/components/StatisticsPanel.tsx` を作成してください。
+
+**仕様**:
+- propsで`mentions: Mention[]`を受け取る
+- `useMentionStats` フックを使って統計を計算
+- Tailwind CSSで4カードのグリッドレイアウト（`grid grid-cols-2 gap-4`）
+- 表示する4つのカード:
+  1. **ステータス分布**: 各ステータスの件数をリスト表示
+  2. **完了率**: パーセンテージを大きく表示
+  3. **平均対応時間**:「X時間Y分」形式で表示
+  4. **対応者ランキング**: 順位付きリスト
+
+**テスト**: `src/presentation/components/StatisticsPanel.spec.tsx` も作成。
+
+**ヒント**: ミリ秒を「X時間Y分」に変換するヘルパー関数をコンポーネント内に作ると良いでしょう。
+
+### Task 8-5: Zustandストア拡張 + `useFilteredMentions` フック + `SearchSortBar` コンポーネント
+
+このTaskは3つのパーツがあります。
+
+#### 8-5a: Zustandストア拡張
+
+`src/presentation/stores/mentionStore.ts` に以下を追加してください：
+
+```typescript
+// 新しい型（別ファイルで定義してもOK）
+type SortKey = 'createdAt' | 'status' | 'assignee';
+type SortOrder = 'asc' | 'desc';
+
+// StateOfMention に追加するフィールド
+searchQuery: string;       // 初期値: ''
+sortKey: SortKey;           // 初期値: 'createdAt'
+sortOrder: SortOrder;       // 初期値: 'desc'
+
+// 追加するアクション
+setSearchQuery: (query: string) => void;
+setSortKey: (key: SortKey) => void;
+setSortOrder: (order: SortOrder) => void;
+```
+
+#### 8-5b: `useFilteredMentions` カスタムフック
+
+`src/presentation/hooks/useFilteredMentions.ts` を作成してください。
+
+**仕様**:
+- 引数: `mentions`, `filter`, `searchQuery`, `sortKey`, `sortOrder`, および各setter関数
+- `useMemo` でフィルター + テキスト検索 + ソートを一括適用した `filteredMentions` を返す
+- `useCallback` で `handleSearchChange`, `handleSortKeyChange`, `handleSortOrderToggle` をメモ化して返す
+
+**学習ポイント**:
+- `useCallback`が必要な理由 → これらのハンドラーを`SearchSortBar`にpropsで渡します。`useCallback`を使わないと、毎レンダリングで新しい関数が作られ、`React.memo`で包んだ子コンポーネントが毎回再レンダリングされてしまいます
+- `useMemo` でフィルター結果をメモ化 → 検索やソートの条件が変わらない限り、同じ配列参照が返される
+
+**テスト**: `src/presentation/hooks/useFilteredMentions.spec.ts` も作成。
+
+#### 8-5c: `SearchSortBar` コンポーネント
+
+`src/presentation/components/SearchSortBar.tsx` を作成してください。
+
+**仕様**:
+- propsでハンドラー関数とソート状態を受け取る
+- テキスト入力欄（`useDebouncedValue` で300msデバウンス）
+- ソートキー選択（select: 日付 / ステータス / 担当者）
+- ソート順トグルボタン（↑昇順 / ↓降順）
+- `console.log('[Render] SearchSortBar がレンダリングされました')` をコンポーネントの先頭に追加
+
+### Task 8-6: React.memo の適用
+
+以下のコンポーネントを `React.memo` で包んでください：
+
+1. **SearchSortBar** → `memo(function SearchSortBar(...) { ... })`
+2. **MentionCard** → `memo(function MentionCard(...) { ... })`
+3. **MentionList** → `memo(function MentionList(...) { ... })`
+
+**同時に MentionList をリファクターしてください**：
+- **Before**: 内部で `useMentions` から `filter` と `mentions` を取得してフィルタリング
+- **After**: propsで `filteredMentions: Mention[]` を受け取るだけ（フィルター・検索・ソートは `useFilteredMentions` に一元化）
+
+各コンポーネントの先頭に `console.log` を入れて、どのコンポーネントがいつ再レンダリングされるかを確認してください。
+
+**学習ポイント**:
+- `React.memo` は「propsが変わっていなければ再レンダリングしない」を実現する
+- ただし、内部で `useMentions()` のようなフックを呼ぶと、ストアの更新でフックが再レンダリングをトリガーするので `React.memo` は効かない
+- propsで受け取る設計にすると `React.memo` が有効になる → これが `MentionList` をリファクターする理由
+
+### Task 8-7: DashboardPage 統合
+
+`src/presentation/pages/DashboardPage.tsx` を修正し、すべてを統合してください。
+
+**目指す構造**:
+```
+DashboardPage（オーケストレーター）
+├── Zustandストアからデータ + setter を取得
+├── useFilteredMentions() でメモ化済みデータ + コールバックを取得
+├── <StatisticsPanel mentions={mentions} />
+├── <FilterBar />                            ← 既存（変更なし）
+├── <SearchSortBar onSearchChange={...} />   ← 新規
+└── <MentionList filteredMentions={...} />   ← props駆動に変更
+```
+
+**学習ポイント**: DashboardPageは「データの流れを管理するオーケストレーター」です。フックからメモ化されたデータとコールバックを取得し、子コンポーネントに渡すことで、各コンポーネントが「自分に関係ある変更」だけで再レンダリングされる構造を作ります。
+
+### Task 8-8: テスト・動作確認
+
+1. **既存テストの更新**: `MentionList.spec.tsx`を新しいprops駆動のインターフェイスに合わせて修正
+2. **全テスト実行**: `npm run test:run` で全テストがパスすることを確認
+3. **動作確認**:
+   ```bash
+   # ターミナル1
+   npm run dev
+   # ターミナル2
+   npx json-server --watch db.json --port 3001
+   ```
+4. **DevToolsでメモ化を確認**: ブラウザの開発者ツールのコンソールで以下を確認
+   - フィルターボタンを押した時 → `[useMemo] filteredMentions を再計算中...` は出るが `[useMemo] statusCounts を再計算中...` は出ない
+   - 検索テキストを入力した時 → `[React.memo] SearchSortBar がレンダリングされました` はデバウンス後のみ
+   - `MentionCard` の `console.log` → propsが変わったカードだけが再レンダリングされる
+5. **lint**: `npm run check` でエラーがないことを確認
+
+**完了したら「Phase 8完了、レビューして」と言ってください。**
+
+---
+
 ## Claudeへの依頼方法
 
 | やりたいこと | 言い方 |
